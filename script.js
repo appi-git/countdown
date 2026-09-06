@@ -1,6 +1,6 @@
 const countdownElement = document.getElementById('countdown');
 
-const dday = new Date(2026,8,12).getTime();
+const dday = new Date(2030,7,10).getTime();
 
 const units = ['years', 'months', 'days', 'hours', 'minutes', 'seconds'];
 
