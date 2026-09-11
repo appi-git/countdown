@@ -25,11 +25,14 @@ function timeUntilDday() {
 function updateCountdown() {
   const time = timeUntilDday();
   units.forEach(unit => {
-    countdownElement.children[unit].textContent = time[unit];
+    countdownElement.children[unit].children[0].textContent = time[unit]
   })
 }
 
 
+updateCountdown();
+
 setInterval(() => {
   updateCountdown();
 }, 1000);
+
