@@ -16,7 +16,6 @@ function getClassHour(isFriday = false){
       String(new Date().getMinutes()).padStart(2, '0')
     }
   `)
-  console.log(time)
 
   const delay = isFriday ? 5 : 0
 
