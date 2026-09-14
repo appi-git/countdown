@@ -7,14 +7,37 @@ body{
 }
 
 #countdown{
-  display: flex;
+  display: grid;
   width: 100vw;
-  justify-content: space-evenly;
+  grid-template-columns: repeat(6, 1fr);
 
   font-size: 1.5rem;
   font-family: monospace, cursive;
 
   animation: fadeIn 1s;
+}
+
+#table-button{
+  padding: 50px;
+  position: absolute;
+  right:0px;
+  bottom:0px;
+}
+
+#table-button:hover{
+  background-color:grey
+}
+#table-button:active{
+  background-color:grey
+}
+
+@media (orientation:portrait){
+  #countdown{
+    flex-direction: column;
+    grid-template-columns: repeat(3, 1fr);
+    row-gap: 5vh;
+    grid-template-rows: repeat(2, 1fr);
+  }
 }
 
 

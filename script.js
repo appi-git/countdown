@@ -32,7 +32,6 @@ function updateCountdown() {
   })
 }
 
-
 updateCountdown();
 
 setInterval(() => {
