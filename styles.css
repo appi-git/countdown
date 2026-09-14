@@ -8,6 +8,7 @@ body{
 
 #countdown{
   display: grid;
+  place-items: center;
   width: 100vw;
   grid-template-columns: repeat(6, 1fr);
 
