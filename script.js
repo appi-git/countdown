@@ -2,6 +2,8 @@ const countdownElement = document.getElementById('countdown');
 
 const dday = new Date(2030,7,10).getTime();
 
+console.log(new Date())
+
 const units = ['years', 'months', 'days', 'hours', 'minutes', 'seconds'];
 
 function timeUntilDday() {
@@ -9,6 +11,7 @@ function timeUntilDday() {
   const now = new Date().getTime();
 
   const diff = dday - now;
+
 
   const time = {}
 

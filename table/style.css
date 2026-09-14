@@ -1,0 +1,9 @@
+body{
+  height:90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: monospace,cursive;
+  font-size: 1.5rem;
+
+}
