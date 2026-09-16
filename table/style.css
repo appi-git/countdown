@@ -3,8 +3,14 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
+  gap:10%;
   font-family: monospace,cursive;
   font-size: 1.5rem;
+}
+
+label{
+  font-style: italic;
+  color: grey;
 }
 
 #count-button{
@@ -19,4 +25,10 @@ body{
 }
 #count-button:active{
   background-color:grey
+}
+
+@media (orientation:portrait){
+  body{
+    flex-direction: column;
+  }
 }

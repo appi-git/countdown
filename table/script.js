@@ -6,14 +6,18 @@ const schedule = [
   ['FoAI&DS','CIS','RECESS','EG&CAD','EG&CAD','MIS1']
 ]
 
-const day = new Date().getDay() - 1;
+
+const array = []
+
+const day = new Date(...array).getDay() - 1;
+
 
 function getClassHour(isFriday = false){
   const time = Number(`
     ${
-      new Date().getHours()
+      new Date(...array).getHours()
     }${
-      String(new Date().getMinutes()).padStart(2, '0')
+      String(new Date(...array).getMinutes()).padStart(2, '0')
     }
   `)
 
@@ -46,6 +50,7 @@ function getClassHour(isFriday = false){
 }
 
 const subjectDiv = document.getElementById('sub')
+const subjectTwoDiv = document.getElementById('sub-two')
 
 function updateSubject(){
   if(day == -1 || day == 5) {
@@ -53,9 +58,18 @@ function updateSubject(){
     return
   }
   const classHour = getClassHour()
-  subject = schedule[day][classHour] === undefined ? 'No Class' : schedule[day][classHour]
+
+  const subject = schedule[day][classHour] === undefined ? 'No Class' : schedule[day][classHour]
+  console.log(classHour)
+  const classHourTwo = classHour === 8 ? 0 : classHour + 1
+  const dayTwo = classHourTwo === 0 && classHour === 8 ? day + 1 : day
+
+  const subjectTwo = schedule[dayTwo][classHourTwo] === undefined ? 'No Class' : schedule[dayTwo][classHourTwo]
+
   if(subjectDiv.textContent == subject) return
+
   subjectDiv.textContent = subject
+  subjectTwoDiv.textContent = subjectTwo
 }
 
 
