@@ -3,19 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Countdown</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Table</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="countdown">
-    <div id="years"><div class="numo"></div><label>years</label></div>
-    <div id="months"><div class="numo"></div><label>months</label></div>
-    <div id="days"><div class="numo"></div><label>days</label></div>
-    <div id="hours"><div class="numo"></div><label>hours</label></div>
-    <div id="minutes"><div class="numo"></div><label>minutes</label></div>
-    <div id="seconds"><div class="numo"></div><label>seconds</label></div>
+  <div id="table-div"></div>
+  <div id="hours-div">
+    <div>
+      <label>Now: </label>
+      <div id="sub"></div>
+    </div>
+    <div>
+      <label>Next: </label>
+      <div id="sub-two"></div>
+    </div>
   </div>
-  <a id="table-button" href="/table"></a>
+  <a id="count-button" href="/count"></a>
   <script src="script.js"></script>
 </body>
 </html>
