@@ -36,16 +36,18 @@ function setupTable(){
     }
     table.appendChild(row)
 
-    if(localStorage.getItem('view-mode')=='table'){
-      document.getElementById('hours-div').style.display = 'none';
-      tableContainer.style.display = 'block';
-    } else if(localStorage.getItem('view-mode')=='hours'){
-      document.getElementById('hours-div').style.display = 'flex';
-      tableContainer.style.display = 'none';
-    }
   }
 
-
+  if(localStorage.getItem('view-mode')=='table'){
+    document.getElementById('hours-div').style.display = 'none';
+    tableContainer.style.display = 'block';
+    const isPortrait = window.matchMedia({'orientation':'portrait'}.matches)
+    const day=new Date().getDay
+    if(isPortrait&&(day==0||day==8)){tableContainer.textContent='No classes today'} 
+  } else if(localStorage.getItem('view-mode')=='hours'){
+    document.getElementById('hours-div').style.display = 'flex';
+    tableContainer.style.display = 'none';
+  }
   tableContainer.appendChild(table)
 }
 
@@ -109,6 +111,7 @@ const subjectTwoDiv = document.getElementById('sub-two')
 
 function updateSubject(){
   const todayToNow = new Date(...array);
+  console.log(todayToNow.getDay())
 
   const day = todayToNow.getDay() - 1;
 
@@ -152,4 +155,4 @@ function updateSubject(){
 
 updateSubject()
 
-// setInterval(updateSubject, 5000)
+setInterval(updateSubject, 2000)
