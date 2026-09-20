@@ -8,21 +8,26 @@ const schedule = [
 
 const days = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 
-const array = []
+const array = [
+  // 2026,8,18,12,39
+]
 
-const day = new Date(...array).getDay() - 1;
+if(!localStorage.getItem('view-mode')){
+  localStorage.setItem('view-mode','hours')
+}
+
 
 function setupTable(){
   const tableContainer = document.getElementById('table-div')
   const table = document.createElement('table')
+  const today = new Date().getDay() - 1
 
   for(let i=0; i<5; i++){
-    console.log(i, schedule[i])
     const row = document.createElement('tr')
     const dayCell = document.createElement('td')
     dayCell.textContent = days[i]
     row.appendChild(dayCell)
-    if(day==i) row.classList.add('today')
+    if(today===i) row.classList.add('today')
 
     for(let j=0; j<8; j++){
       const cell = document.createElement('td')
@@ -30,6 +35,14 @@ function setupTable(){
       row.appendChild(cell)
     }
     table.appendChild(row)
+
+    if(localStorage.getItem('view-mode')=='table'){
+      document.getElementById('hours-div').style.display = 'none';
+      tableContainer.style.display = 'block';
+    } else if(localStorage.getItem('view-mode')=='hours'){
+      document.getElementById('hours-div').style.display = 'flex';
+      tableContainer.style.display = 'none';
+    }
   }
 
 
@@ -41,24 +54,27 @@ setupTable()
 document.getElementById('hours-div').addEventListener('click',()=>{
   document.getElementById('hours-div').style.display = 'none';
   document.getElementById('table-div').style.display = 'block';
+  localStorage.setItem('view-mode','table')
 })
 document.getElementById('table-div').addEventListener('click',()=>{
-  console.log(document.getElementById('table-div').style.display)
   document.getElementById('hours-div').style.display = 'flex';
   document.getElementById('table-div').style.display = 'none';
+  localStorage.setItem('view-mode','hours')
 })
 
 
-function getClassHour(isFriday = false){
+function getClassHour(toNow, isFriday = false){
   const time = Number(`
     ${
-      new Date(...array).getHours()
+      toNow.getHours()
     }${
-      String(new Date(...array).getMinutes()).padStart(2, '0')
+      String(toNow.getMinutes()).padStart(2, '0')
     }
   `)
 
   const delay = isFriday ? 5 : 0
+
+  if(time>1240&&isFriday) return 8
 
   switch (true) {
     case time<800:
@@ -89,27 +105,51 @@ function getClassHour(isFriday = false){
 const subjectDiv = document.getElementById('sub')
 const subjectTwoDiv = document.getElementById('sub-two')
 
+
+
 function updateSubject(){
-  if(day == -1 || day == 5) {
-    subjectDiv.textContent = 'No Class'
-    return
+  const todayToNow = new Date(...array);
+
+  const day = todayToNow.getDay() - 1;
+
+  const classHour = getClassHour(todayToNow, day===4)
+
+  const nowDule = {now:{},next:{}}
+  nowDule.now.day=day;
+
+  if(schedule[day]&&schedule[day][classHour]){
+    nowDule.now.subject = schedule[day][classHour];
+  } else{
+    nowDule.now.subject = 'No Class'
   }
-  const classHour = getClassHour()
 
-  const subject = schedule[day][classHour] === undefined ? 'No Class' : schedule[day][classHour]
-  console.log(classHour)
-  const classHourTwo = classHour === 8 ? 0 : classHour + 1
-  const dayTwo = classHourTwo === 0 && classHour === 8 ? day + 1 : day
 
-  const subjectTwo = schedule[dayTwo][classHourTwo] === undefined ? 'No Class' : schedule[dayTwo][classHourTwo]
+  const classHourTwo = classHour === 8 ? 0 : classHour + 1;
 
-  if(subjectDiv.textContent == subject) return
+  if(classHourTwo===0&&classHour===8){
+    nowDule.next.day = day<=3 ? day + 1 : 0
+  } else{
+    nowDule.next.day = day
+  }
 
-  subjectDiv.textContent = subject
-  subjectTwoDiv.textContent = subjectTwo
+
+  if(schedule[nowDule.next.day]&&schedule[nowDule.next.day][classHourTwo]){
+    nowDule.next.subject = schedule[nowDule.next.day][classHourTwo];
+  } else{
+    nowDule.next.subject = 'No Class'
+  }
+
+  console.log(todayToNow)
+  console.log(classHour, classHourTwo)
+  console.log(nowDule)
+
+  if(subjectDiv.textContent===nowDule.now.subject&&subjectTwoDiv.textContent===nowDule.next.subject) return
+
+  subjectDiv.textContent = nowDule.now.subject
+  subjectTwoDiv.textContent = nowDule.next.subject
 }
 
 
 updateSubject()
 
-setInterval(updateSubject, 2000)
+// setInterval(updateSubject, 5000)
