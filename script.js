@@ -9,61 +9,12 @@ const schedule = [
 const days = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 
 const array = [
-  // 2026,8,18,12,39
+  // 2026,8,16,18,54
 ]
 
 if(!localStorage.getItem('view-mode')){
   localStorage.setItem('view-mode','hours')
 }
-
-
-function setupTable(){
-  const tableContainer = document.getElementById('table-div')
-  const table = document.createElement('table')
-  const today = new Date().getDay() - 1
-
-  for(let i=0; i<5; i++){
-    const row = document.createElement('tr')
-    const dayCell = document.createElement('td')
-    dayCell.textContent = days[i]
-    row.appendChild(dayCell)
-    if(today===i) row.classList.add('today')
-
-    for(let j=0; j<8; j++){
-      const cell = document.createElement('td')
-      cell.textContent = schedule[i][j] === undefined ? 'No Class' : schedule[i][j]
-      row.appendChild(cell)
-    }
-    table.appendChild(row)
-
-  }
-
-  if(localStorage.getItem('view-mode')=='table'){
-    document.getElementById('hours-div').style.display = 'none';
-    tableContainer.style.display = 'block';
-    const isPortrait = window.matchMedia({'orientation':'portrait'}.matches)
-    const day=new Date().getDay
-    if(isPortrait&&(day==0||day==8)){tableContainer.textContent='No classes today'} 
-  } else if(localStorage.getItem('view-mode')=='hours'){
-    document.getElementById('hours-div').style.display = 'flex';
-    tableContainer.style.display = 'none';
-  }
-  tableContainer.appendChild(table)
-}
-
-setupTable()
-
-document.getElementById('hours-div').addEventListener('click',()=>{
-  document.getElementById('hours-div').style.display = 'none';
-  document.getElementById('table-div').style.display = 'block';
-  localStorage.setItem('view-mode','table')
-})
-document.getElementById('table-div').addEventListener('click',()=>{
-  document.getElementById('hours-div').style.display = 'flex';
-  document.getElementById('table-div').style.display = 'none';
-  localStorage.setItem('view-mode','hours')
-})
-
 
 function getClassHour(toNow, isFriday = false){
   const time = Number(`
@@ -100,18 +51,78 @@ function getClassHour(toNow, isFriday = false){
     case time>=1340:
       return 8
   }
-
-  return time 
 }
 
-const subjectDiv = document.getElementById('sub')
-const subjectTwoDiv = document.getElementById('sub-two')
+function setupTable(isPortrait){
+  const tableContainer = document.getElementById('table-div')
+   
+  tableContainer.replaceChildren()
+
+  const table = document.createElement('table')
+  const todayToNow = new Date(...array)
+  const today = todayToNow.getDay()-1
+
+  
+
+  if(isPortrait&&(today==-1||today==5)){
+    console.log('what')
+    tableContainer.textContent='No classes today';
+    tableContainer.appendChild(table);
+    return
+  }
+
+  for(let i=0; i<5; i++){
+    const row = document.createElement('tr')
+    const dayCell = document.createElement('td')
+    dayCell.textContent = days[i]
+    row.appendChild(dayCell)
+    if(today===i) row.classList.add('today')
+
+    for(let j=0; j<8; j++){
+      const cell = document.createElement('td')
+      cell.textContent = schedule[i][j] === undefined ? 'No Class' : schedule[i][j]
+      if(
+        getClassHour(todayToNow)===j
+        &&today===i
+        &&schedule[i]
+        &&schedule[i][j]
+      ){cell.classList.add('tonow')}
+      row.appendChild(cell)
+    }
+    table.appendChild(row)
+
+  }
+
+  if(localStorage.getItem('view-mode')=='table'){
+    document.getElementById('hours-div').style.display = 'none';
+    tableContainer.style.display = 'block'; 
+  } else if(localStorage.getItem('view-mode')=='hours'){
+    document.getElementById('hours-div').style.display = 'flex';
+    tableContainer.style.display = 'none';
+  }
+  tableContainer.appendChild(table)
+}
+setupTable()
+
+document.getElementById('main-container').addEventListener('click',()=>{
+  if(localStorage.getItem('view-mode')=='table'){
+    document.getElementById('hours-div').style.display = 'flex';
+    document.getElementById('table-div').style.display = 'none';
+    localStorage.setItem('view-mode','hours')
+  } else if(localStorage.getItem('view-mode')=='hours'){
+    document.getElementById('hours-div').style.display = 'none';
+    document.getElementById('table-div').style.display = 'block';
+    localStorage.setItem('view-mode','table')
+  }
+  updateSubject()
+})
 
 
+function updateHour(){
+  const subjectDiv = document.getElementById('sub')
+  const subjectTwoDiv = document.getElementById('sub-two')
 
-function updateSubject(){
   const todayToNow = new Date(...array);
-  console.log(todayToNow.getDay())
 
   const day = todayToNow.getDay() - 1;
 
@@ -142,9 +153,9 @@ function updateSubject(){
     nowDule.next.subject = 'No Class'
   }
 
-  console.log(todayToNow)
-  console.log(classHour, classHourTwo)
-  console.log(nowDule)
+  // console.log(todayToNow)
+  // console.log(classHour, classHourTwo)
+  // console.log(nowDule)
 
   if(subjectDiv.textContent===nowDule.now.subject&&subjectTwoDiv.textContent===nowDule.next.subject) return
 
@@ -152,6 +163,33 @@ function updateSubject(){
   subjectTwoDiv.textContent = nowDule.next.subject
 }
 
+function updateTable(){
+  const todayToNow = new Date(...array)
+  const classHour = getClassHour(todayToNow)+1
+  const tableContainer = document.getElementById('table-div')
+  const isPortrait = window.matchMedia('(orientation:portrait)').matches
+
+  const today = tableContainer.querySelector('.today') ?? -1
+  console.log(isPortrait,today,isPortrait&&today===-1)
+  if(isPortrait&&today===-1) {
+    tableContainer.textContent='No classes today';
+    return
+  }
+
+  const toNow = today.querySelector('.tonow')
+
+  if(toNow===today.children[classHour]) return
+  setupTable(isPortrait)
+}
+
+
+
+
+function updateSubject(){
+  const viewMode = localStorage.getItem('view-mode')
+  if(viewMode=='table') updateTable()
+  else if (viewMode==='hours') updateHour()
+}
 
 updateSubject()
 

@@ -41,6 +41,11 @@ td{
   margin-bottom:-2px;
 }
 
+.tonow{
+  background-color: black;
+  color:white;
+}
+
 #hours-div{
   display:flex;
   flex-direction: row;
