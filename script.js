@@ -9,7 +9,7 @@ const schedule = [
 const days = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 
 const array = [
-  // 2026,8,16,18,54
+    // 2026,9,9,8,54
 ]
 
 if(!localStorage.getItem('view-mode')){
@@ -54,7 +54,7 @@ function getClassHour(toNow, isFriday = false){
 }
 
 function setupTable(isPortrait){
-  const tableContainer = document.getElementById('table-div')
+  const tableContainer = document.getElementById('table-div-table-div')
    
   tableContainer.replaceChildren()
 
@@ -62,21 +62,14 @@ function setupTable(isPortrait){
   const todayToNow = new Date(...array)
   const today = todayToNow.getDay()-1
 
-  
-
-  if(isPortrait&&(today==-1||today==5)){
-    console.log('what')
-    tableContainer.textContent='No classes today';
-    tableContainer.appendChild(table);
-    return
-  }
-
   for(let i=0; i<5; i++){
     const row = document.createElement('tr')
     const dayCell = document.createElement('td')
     dayCell.textContent = days[i]
+    row.dataset.day = days[i].toLowerCase()
     row.appendChild(dayCell)
-    if(today===i) row.classList.add('today')
+    if(today===i) {row.classList.add('today-table');row.classList.add('selected-table')}
+    else if((today===-1||today===5)&&i===0) row.classList.add('selected-table')
 
     for(let j=0; j<8; j++){
       const cell = document.createElement('td')
@@ -92,26 +85,52 @@ function setupTable(isPortrait){
     table.appendChild(row)
 
   }
-
-  if(localStorage.getItem('view-mode')=='table'){
-    document.getElementById('hours-div').style.display = 'none';
-    tableContainer.style.display = 'block'; 
-  } else if(localStorage.getItem('view-mode')=='hours'){
-    document.getElementById('hours-div').style.display = 'flex';
-    tableContainer.style.display = 'none';
-  }
   tableContainer.appendChild(table)
 }
 setupTable()
 
-document.getElementById('main-container').addEventListener('click',()=>{
+function setupNavButtons(){
+  const navButtonContainer = document.getElementById('nav-buttons-div')
+  const today = new Date(...array).getDay()-1
+
+  for(const day of days){
+    const div = document.createElement('div')
+    div.classList.add('nav-button')
+    div.dataset.day=day.toLowerCase()
+    if(days[today]===day){
+      div.classList.add('today-nav','selected-nav')
+    } else if((today===-1||today===5)&&day==='Monday'){
+      div.classList.add('selected-nav')
+    }
+    navButtonContainer.appendChild(div)
+  }
+
+  navButtonContainer.addEventListener('click',(event)=>{
+    const selectedTable = document.querySelector('.selected-table')
+    const selectedNav = document.querySelector('.selected-nav')
+    const tableContainer = document.getElementById('table-div-table-div')
+    const rows = tableContainer.querySelectorAll('tr')
+    rows.forEach(row=>{
+      if(row.dataset.day===event.target.dataset.day){
+        selectedTable.classList.remove('selected-table')
+        row.classList.add('selected-table')
+        selectedNav.classList.remove('selected-nav')
+        event.target.classList.add('selected-nav')
+      }
+    })
+  })
+}
+setupNavButtons()
+
+document.getElementById('main-container').addEventListener('click',(event)=>{
+  if(event.target.classList.contains('nav-button')||event.target.id==='nav-buttons-div') return
   if(localStorage.getItem('view-mode')=='table'){
     document.getElementById('hours-div').style.display = 'flex';
     document.getElementById('table-div').style.display = 'none';
     localStorage.setItem('view-mode','hours')
   } else if(localStorage.getItem('view-mode')=='hours'){
     document.getElementById('hours-div').style.display = 'none';
-    document.getElementById('table-div').style.display = 'block';
+    document.getElementById('table-div').style.display = 'flex';
     localStorage.setItem('view-mode','table')
   }
   updateSubject()
@@ -123,11 +142,8 @@ function updateHour(){
   const subjectTwoDiv = document.getElementById('sub-two')
 
   const todayToNow = new Date(...array);
-
   const day = todayToNow.getDay() - 1;
-
   const classHour = getClassHour(todayToNow, day===4)
-
   const nowDule = {now:{},next:{}}
   nowDule.now.day=day;
 
@@ -137,25 +153,18 @@ function updateHour(){
     nowDule.now.subject = 'No Class'
   }
 
-
   const classHourTwo = classHour === 8 ? 0 : classHour + 1;
-
   if(classHourTwo===0&&classHour===8){
     nowDule.next.day = day<=3 ? day + 1 : 0
   } else{
     nowDule.next.day = day
   }
 
-
   if(schedule[nowDule.next.day]&&schedule[nowDule.next.day][classHourTwo]){
     nowDule.next.subject = schedule[nowDule.next.day][classHourTwo];
   } else{
     nowDule.next.subject = 'No Class'
   }
-
-  // console.log(todayToNow)
-  // console.log(classHour, classHourTwo)
-  // console.log(nowDule)
 
   if(subjectDiv.textContent===nowDule.now.subject&&subjectTwoDiv.textContent===nowDule.next.subject) return
 
@@ -166,17 +175,14 @@ function updateHour(){
 function updateTable(){
   const todayToNow = new Date(...array)
   const classHour = getClassHour(todayToNow)+1
-  const tableContainer = document.getElementById('table-div')
+  const tableContainer = document.getElementById('table-div-table-div')
   const isPortrait = window.matchMedia('(orientation:portrait)').matches
 
-  const today = tableContainer.querySelector('.today') ?? -1
-  console.log(isPortrait,today,isPortrait&&today===-1)
-  if(isPortrait&&today===-1) {
-    tableContainer.textContent='No classes today';
-    return
-  }
+  const today = tableContainer.querySelector('.today-table') ?? -1
 
-  const toNow = today.querySelector('.tonow')
+  if(today===-1) return
+
+  const toNow = today.querySelector('.tonow') ?? -1
 
   if(toNow===today.children[classHour]) return
   setupTable(isPortrait)
@@ -187,10 +193,18 @@ function updateTable(){
 
 function updateSubject(){
   const viewMode = localStorage.getItem('view-mode')
+  if(viewMode==='table'){
+    document.getElementById('hours-div').style.display = 'none';
+    document.getElementById('table-div').style.display = 'flex';
+  } else if(viewMode==='hours'){
+    document.getElementById('hours-div').style.display = 'flex';
+    document.getElementById('table-div').style.display = 'none';
+  }
   if(viewMode=='table') updateTable()
   else if (viewMode==='hours') updateHour()
+
 }
 
 updateSubject()
 
-setInterval(updateSubject, 2000)
+// setInterval(updateSubject, 2000)
