@@ -136,6 +136,10 @@ document.getElementById('main-container').addEventListener('click',(event)=>{
   updateSubject()
 })
 
+document.addEventListener('keydown',(event)=>{
+  if(event.key==='s') document.getElementById('main-container').click() 
+})
+
 
 function updateHour(){
   const subjectDiv = document.getElementById('sub')
@@ -207,4 +211,4 @@ function updateSubject(){
 
 updateSubject()
 
-// setInterval(updateSubject, 2000)
+setInterval(updateSubject, 2000)
