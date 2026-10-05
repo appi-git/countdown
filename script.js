@@ -193,17 +193,21 @@ function updateTable(){
 }
 
 
-
+const lastHour = getClassHour(new Date(...array))
 
 function updateSubject(){
   const viewMode = localStorage.getItem('view-mode')
+
   if(viewMode==='table'){
     document.getElementById('hours-div').style.display = 'none';
     document.getElementById('table-div').style.display = 'flex';
+    if(lastHour===(getClassHour(new Date(...array)))) return
   } else if(viewMode==='hours'){
     document.getElementById('hours-div').style.display = 'flex';
     document.getElementById('table-div').style.display = 'none';
   }
+
+
   if(viewMode=='table') updateTable()
   else if (viewMode==='hours') updateHour()
 
